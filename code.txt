@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multilingual Translator</title>
+<script>
+function translateText(targetLanguage) {
+    var englishText = document.getElementById("englishText").textContent.trim();
+    var apiUrl = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=' + targetLanguage + '&dt=t&q=' + encodeURI(englishText);
+    
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            var translatedText = data[0][0][0];
+            document.getElementById("translatedText").textContent = translatedText;
+            speakText(translatedText, targetLanguage);
+        })
+        .catch(error => {
+            console.error('Error fetching translation:', error);
+        });
+}
+
+function startSpeechRecognition() {
+    var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
+    
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    
+    recognition.onresult = function(event) {
+        var speechResult = event.results[0][0].transcript;
+        document.getElementById("englishText").textContent = speechResult;
+    };
+    
+    recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+    };
+    
+    recognition.start();
+}
+
+function speakText(text, lang) {
+    var synth = window.speechSynthesis;
+    var utterThis = new SpeechSynthesisUtterance(text);
+
+    switch(lang) {
+        case 'es':
+            utterThis.lang = 'es-ES';
+            break;
+        case 'fr':
+            utterThis.lang = 'fr-FR';
+            break;
+        case 'de':
+            utterThis.lang = 'de-DE';
+            break;
+        case 'it':
+            utterThis.lang = 'it-IT';
+            break;
+        case 'ja':
+            utterThis.lang = 'ja-JP';
+            break;
+        case 'ko':
+            utterThis.lang = 'ko-KR';
+            break;
+        case 'hi':
+            utterThis.lang = 'hi-IN';
+            break;
+        case 'ta':
+            utterThis.lang = 'ta-IN';
+            break;
+        case 'ur':
+            utterThis.lang = 'ur-PK';
+            break;
+        case 'ps':
+            utterThis.lang = 'ps-AF';
+            break;
+        default:
+            utterThis.lang = 'en-US';
+            break;
+    }
+
+    synth.speak(utterThis);
+}
+</script>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #ADD8E6; /* Light Blue Background */
+        color: #333;
+        text-align: center;
+        padding: 50px;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+    h1 {
+        font-size: 3em;
+        margin-bottom: 20px;
+        color: #fff;
+        animation: glow 1s ease-in-out infinite alternate;
+    }
+    p, h2, select, button {
+        margin-bottom: 20px;
+        font-size: 1.2em;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 1em;
+        background-color: #6200ea;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    button:hover {
+        background-color: #3700b3;
+        transform: scale(1.1);
+    }
+    select {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+    @keyframes glow {
+        from {
+            text-shadow: 0 0 10px #fff, 0 0 20px #ff00ff, 0 0 30px #ff00ff, 0 0 40px #ff00ff, 0 0 50px #ff00ff, 0 0 60px #ff00ff, 0 0 70px #ff00ff;
+        }
+        to {
+            text-shadow: 0 0 20px #fff, 0 0 30px #ff00ff, 0 0 40px #ff00ff, 0 0 50px #ff00ff, 0 0 60px #ff00ff, 0 0 70px #ff00ff, 0 0 80px #ff00ff;
+        }
+    }
+    .icon {
+        width: 50px;
+        height: 50px;
+        margin: 10px;
+    }
+</style>
+</head>
+<body>
+    <h1><b><u>Multilingual Translator</u></b></h1>
+    <div>
+        <img src="https://img.icons8.com/color/48/000000/google-translate.png" class="icon" alt="translate-icon"/>
+        <img src="https://img.icons8.com/color/48/000000/microphone.png" class="icon" alt="microphone-icon"/>
+    </div>
+    <button onclick="startSpeechRecognition()">Start Speech Recognition</button>
+    
+    <p id="englishText">
+        Here is your English paragraph that you want to translate into various languages. Replace this text with your own.
+    </p>
+    
+    <h2>Select language to convert:</h2>
+    <select id="languageSelect" onchange="translateText(this.value)">
+        <option value="es">Spanish</option>
+        <option value="fr">French</option>
+        <option value="de">German</option>
+        <option value="it">Italian</option>
+        <option value="ja">Japanese</option>
+        <option value="ko">Korean</option>
+        <option value="hi">Hindi</option>
+        <option value="ta">Tamil</option>
+        <option value="ur">Urdu</option>
+        <option value="ps">Pashto (Afghani)</option>
+    </select>    
+    
+    <p id="translatedText">
+        <!-- Translated text will appear here -->
+    </p>
+</body>
+</html>
